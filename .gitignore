@@ -1,5 +1,6 @@
 .DS_Store
 .idea
+.next
 .nyc_output
 .vscode
 yarn-error.log

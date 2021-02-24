@@ -1,48 +1,50 @@
 import request from 'supertest';
 import { app } from '../../app';
 
-it('fails when email does not exist is supplied', async () => {
-  return request(app)
+it('fails when a email that does not exist is supplied', async () => {
+  await request(app)
     .post('/api/users/signin')
     .send({
-      email: "test@test.com",
-      password: "password"
+      email: 'test@test.com',
+      password: 'password'
     })
     .expect(400);
 });
 
-it('fails when incorrect password is supplied', async () => {
-  process.env.JWT_KEY = 'test';
+it('fails when an incorrect password is supplied', async () => {
   await request(app)
     .post('/api/users/signup')
     .send({
-      email: "test@test.com",
-      password: "password"
+      email: 'test@test.com',
+      password: 'password'
     })
     .expect(201);
 
   await request(app)
     .post('/api/users/signin')
     .send({
-      email: "test@test.com",
-      password: "password1"
+      email: 'test@test.com',
+      password: 'aslkdfjalskdfj'
     })
     .expect(400);
 });
 
-it('respond with a cookies when given valid credantials', async () => {
-  process.env.JWT_KEY = 'test';
+it('responds with a cookie when given valid credentials', async () => {
   await request(app)
     .post('/api/users/signup')
     .send({
-      email: "test@test.com",
-      password: "password"
+      email: 'test@test.com',
+      password: 'password'
     })
     .expect(201);
 
   const response = await request(app)
-    .post('/api/users/signout')
-    .send({})
+    .post('/api/users/signin')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
+    })
     .expect(200);
-  expect(response.get('Set-Cookie')[0]).toEqual('express:sess=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; httponly')
+
+  expect(response.get('Set-Cookie')).toBeDefined();
 });
